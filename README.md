@@ -1,106 +1,177 @@
-# FISDFunctionCallingDemo
+# MarketMind
 
-This project demonstrates using Google Cloud Functions to implement a function-calling flow with Gemini, integrating with external APIs (Finhub) and BigQuery. It uses Streamlit for a user interface and leverages the `functions-framework` for local development.
+![MarketMind Logo](images/mmlogo1.png)
 
-## Project Structure
+MarketMind is a sophisticated financial analyst chatbot designed to provide insightful market analysis and data-driven investment strategies. It features an intuitive user interface built with Streamlit and leverages the power of Gemini AI models for advanced analytical capabilities. MarketMind seamlessly integrates with leading financial data APIs, including Finnhub and Alpha Vantage, and can connect to Google BigQuery for robust data storage and retrieval.
 
-* **`main.py`**: This is the main entry point for the Cloud Function. It handles user input from the Streamlit interface, interacts with the Gemini model, processes function calls, and displays responses.
-* **`helperfinhub.py`**: Contains functions for interacting with the Finhub API.  Each function corresponds to a specific Finhub API endpoint.
-* **`helperbqfunction.py`**: Contains functions for interacting with BigQuery.  These functions handle dataset listing, table information retrieval, and SQL query execution.
-* **`geminifunctionfinhub.py`**: Defines the function declarations for Finhub API calls that Gemini can use.
-* **`geminifunctionsbq.py`**: Defines the function declarations for BigQuery operations that Gemini can use.
-* **`helpercode.py`**: Contains utility functions, such as fetching text content from URLs, used to support API interactions.
+## Features
 
-## Functionality
+- **Analyst Reports:** Generate comprehensive analyst reports for US stocks.
+- **Report Comparison:** Compare analyst reports side-by-side.
+- **Interactive Chat:** Chat with data and responses to gain deeper insights.
+- **Symbol Lookup:** Easily find company ticker symbols.
+- **Comprehensive Company Data:** Access company news, profiles, basic financials, peer analysis, insider sentiment, and SEC filings.
+- **Real-time Share Prices:** Retrieve current stock prices.
+- **Flexible AI Models:** Supports various Gemini models (e.g., gemini-1.5-pro-002, gemini-1.5-flash-002, gemini-2.0-flash-exp), configurable by the user.
+- **Optional User Authentication:** Secure access with optional user authentication.
+- **Asynchronous Operations:** Utilizes asynchronous agent capabilities for handling long-running tasks efficiently.
 
-The application allows users to interact with Gemini via a Streamlit chat interface. User queries can trigger function calls to either Finhub or BigQuery, based on the function declarations provided to the model.  The results from these calls are then incorporated into Gemini's response.  The application handles both serial and parallel function calls from Gemini.
+## Getting Started
 
-## Local Development
+This section will guide you through setting up and running MarketMind on your local machine or Google Cloud.
 
-1. **Set up virtual environment:**  Create and activate a virtual environment to manage project dependencies.
-2. **Install dependencies:** Install the required packages from `requirements.txt`:
-   ```bash
-   pip install -r requirements.txt
+### Prerequisites
 
-MarketMind
+Before you begin, ensure you have the following:
 
+- **Python:** Python 3.x (e.g., Python 3.8 or newer).
+- **Google Cloud Project:** A Google Cloud Platform project with billing enabled.
+- **Enabled Google Cloud APIs:**
+    - Vertex AI API
+    - Pub/Sub API (required if you plan to use the asynchronous agent feature for long-running tasks)
+    - Secret Manager API (for securely storing API keys and other secrets)
+- **Service Account:** A Google Cloud service account with the following roles (or equivalent permissions):
+    - `Vertex AI User`: To interact with Gemini models.
+    - `Pub/Sub Publisher`: To publish messages for asynchronous tasks.
+    - `Secret Manager Secret Accessor`: To access API keys stored in Secret Manager.
 
+### Installation
 
-This demo showcases an AI-powered financial analyst built using Gemini, capable of complex financial analysis and reporting. It addresses the challenge of quickly gathering and analyzing diverse financial data, streamlining investment research and decision-making.
+1.  **Clone the Repository:**
+    ```bash
+    git clone https://github.com/your-username/marketmind.git # Replace with the actual repository URL
+    ```
+2.  **Navigate to Project Directory:**
+    ```bash
+    cd marketmind
+    ```
+3.  **Install Dependencies:**
+    It's recommended to create a virtual environment first.
+    ```bash
+    python -m venv venv
+    source venv/bin/activate  # On Windows use `venv\Scripts\activate`
+    pip install -r requirements.txt
+    ```
 
-Business Value:
+### Configuration
 
-Accelerated Research: The demo automates the tedious process of collecting data from various sources (BigQuery for market data, Finnhub for company information, news sentiment APIs), enabling analysts to focus on higher-level insights.
-Enhanced Decision-Making: By providing a comprehensive overview of a company's financials, news, and peer comparisons, the demo empowers users to make better-informed investment choices.
-Improved Efficiency: Automating the analysis process frees up analysts' time, allowing them to handle larger volumes of research or dedicate their expertise to more complex tasks.
-Data-Driven Insights: The tool leverages large datasets and AI, providing insights that might be missed by manual analysis.
-Technical Value:
+Proper configuration is key to running MarketMind successfully.
 
-Gemini's Power: The demo highlights the capabilities of Gemini for complex reasoning, tool use, and function calling.
-Integration with Google Cloud: It demonstrates seamless integration with various Google Cloud services, including Vertex AI, BigQuery, and Secret Manager.
-Scalability: The architecture is inherently scalable, allowing for handling increasing volumes of data and requests.
-Extensibility: The demo can be easily extended to incorporate additional data sources and analytical functions.
-Business Challenge Solved:
+#### API Keys & Secrets
 
-The demo addresses the challenge of efficient financial analysis in a data-rich environment. Traditional research methods are time-consuming and often involve manual data aggregation from disparate sources. This demo provides a unified platform to access and analyze relevant information quickly, empowering analysts and investors with readily available insights.
+MarketMind requires API keys for financial data providers. These keys must be stored securely in Google Cloud Secret Manager within your Google Cloud project.
 
-The demo addresses the challenge of efficient financial analysis in a data-rich environment. Traditional research methods are time-consuming and often involve manual data aggregation from disparate sources. This demo provides a unified platform to access and analyze relevant information quickly
+Create the following secrets in Secret Manager:
 
-This demo showcases an AI-powered financial analyst built using Gemini Agents, capable of complex financial analysis and reporting. It addresses the challenge of quickly gathering and analyzing diverse financial data, streamlining investment research and decision-making. raditional research methods are time-consuming and often involve manual data aggregation from disparate sources. This demo provides a unified platform to access and analyze relevant information quickly.
+-   `FinHubAccessKey`: Your API key for Finnhub.
+-   `AlphaVantageKey`: Your API key for Alpha Vantage.
+-   `AssetMPlatformKey`: (Required if `USEAUTH=True`) The content of your OAuth 2.0 client credentials JSON file obtained from Google Cloud Console. This is used for user authentication.
 
+#### Environment Variables
 
+MarketMind uses environment variables for various settings. These can be set in your shell, a `.env` file (if using a library like `python-dotenv`), or directly in your deployment environment (e.g., Cloud Run).
 
-Attendees will be wowed by the seamless integration of Gemini's natural language capabilities with real-time financial data analysis. Imagine asking, "What are the key financial indicators for Tesla compared to its competitors, and what has the news sentiment been around the company this week?" and getting a comprehensive, data-driven response instantly, pulling information from Finnhub, BigQuery, and news sentiment APIs – all orchestrated through a conversational interface. The speed and depth of analysis, combined with the intuitive interaction, are the key "wow" factors.
+-   `PROJECT_ID`: Your Google Cloud Project ID. The application will attempt to automatically determine this using `helpercode.get_project_id()`, but setting it explicitly is recommended.
+-   `USEAUTH`: Set to `True` to enable user authentication or `False` to disable. Defaults to `True`.
+-   `TOPICID`: The Google Cloud Pub/Sub topic ID used for asynchronous agent operations. If not set, it defaults to `marketmind-async-topic`. Ensure this topic exists in your Google Cloud project if you intend to use asynchronous features.
 
-Teaching Attendees:
+#### BigQuery
 
-The demo's open-source nature, coupled with clear documentation (the README.md and potentially additional materials), will be crucial for attendee learning. The code showcases how to:
+The application is configured to potentially interact with Google BigQuery. For example, it might look for a dataset named `lseg_data_normalised` (as referenced in parts of the codebase).
 
-Structure a function-calling application: Attendees can examine the project structure, including how function declarations are defined and how the main.py file orchestrates the interaction between Gemini, the Streamlit UI, and the backend functions.
-Integrate with external APIs and BigQuery: The code demonstrates practical examples of making API calls (Finnhub) and querying BigQuery, providing reusable templates for similar integrations.
-Handle Gemini's function-calling responses: The demo shows how to process and display the structured data returned by Gemini's function calls, which is essential for building effective applications.
-Call to Action:
+-   Ensure any BigQuery datasets and tables that MarketMind expects are available in your project.
+-   You may need to adjust table or dataset names in the code or configuration if your setup differs.
 
-The call to action will be multi-pronged:
+#### OAuth Consent Screen & Credentials
 
-Explore the code: Attendees should be encouraged to download the code from the repository (GitHub, etc.), experiment with it, and adapt it to their use cases.
-Join the community: A call to join a Google Cloud community forum or Slack channel would allow attendees to continue learning, ask questions, and share their experiences.
-Build their own applications: The ultimate goal is to inspire attendees to leverage Gemini and Google Cloud to develop their own AI-powered solutions, potentially in the financial domain or other areas that benefit from data analysis and intelligent automation. Clear documentation and community support are essential for achieving this.
+If you are using the user authentication feature (`USEAUTH=True`):
 
-This demo showcases an AI-powered financial analyst built with Gemini, enabling complex analysis and reporting through natural language. Users can query real-time financial data from Finnhub and BigQuery via a Streamlit interface, receiving comprehensive insights on companies, market trends, and news sentiment. The application demonstrates Gemini's function-calling capabilities, seamlessly integrating with external APIs and databases for streamlined investment research. The provided codebase offers a practical example of building intelligent, data-driven applications on Google Cloud. Experience the future of financial analysis with the power of Gemini.
+1.  **Configure OAuth Consent Screen:** In the Google Cloud Console, navigate to "APIs & Services" -> "OAuth consent screen." Configure it for your application.
+2.  **Create OAuth 2.0 Client ID:**
+    -   Go to "APIs & Services" -> "Credentials."
+    -   Click "Create Credentials" -> "OAuth client ID."
+    -   Select "Web application" as the application type.
+    -   **Authorized JavaScript origins:** Add URIs like `http://localhost:8501` (for local development) and your deployed application's URL (e.g., `https://your-cloud-run-service-url.run.app`).
+    -   **Authorized redirect URIs:** Add URIs like `http://localhost:8501/` and `https://your-cloud-run-service-url.run.app/`. The application will construct the full redirect path (e.g., `/login/google/authorized`).
+    -   After creation, download the JSON credentials. The content of this JSON file should be stored as the `AssetMPlatformKey` secret in Google Cloud Secret Manager.
 
+## Usage
 
-Developers:
+This section describes how to run and interact with the MarketMind application.
 
-Learning Gemini function calling: The project serves as an educational resource for developers learning how to implement function calling with Gemini. The clear project structure and example code provide a practical template for building similar applications.
-Integrating with external APIs and BigQuery: Developers can learn how to connect Gemini to external data sources like Finnhub and BigQuery, gaining experience with data integration and API interaction within a Gemini-powered application.
-Building Streamlit interfaces for LLMs: The project demonstrates how to use Streamlit to create interactive user interfaces for Gemini-based applications, showcasing how to handle user input and display model responses.
-Customers (Financial Industry):
+## Technical Overview
 
-Accelerated Financial Analysis: Financial analysts can use this type of application to quickly gather and analyze company information, market data, and news sentiment, enabling faster and more informed decision-making.
-Investment Research: The demo provides a platform for conducting comprehensive investment research, automating the collection and analysis of relevant financial data.
-Automated Reporting: The tool can be used to generate customized financial reports, saving time and resources compared to manual report creation.
-Partners (Technology Consultants/Integrators):
+This section provides a brief overview of the main components and directories within the MarketMind project:
 
-Building custom solutions for financial clients: System integrators can leverage the project as a starting point for developing tailored financial analysis solutions for their clients, incorporating additional data sources and analytical functionalities.
-Demonstrating Gemini's capabilities: The demo can be used to showcase the power and flexibility of Gemini to potential clients in the financial industry.
-Expanding service offerings: Consultants can add Gemini-based solutions to their portfolio, offering new services related to AI-driven financial analysis and reporting.
+-   **`main.py`**: The main entry point for the Streamlit web application. It initializes the user interface, manages session state, handles user input, and orchestrates calls to the Gemini AI models and various helper functions.
 
+-   **`gemini*handler.py`** (e.g., `gemini15handler.py`, `gemini20handler.py`): These modules are responsible for interfacing with specific versions or configurations of the Gemini API. They manage the conversation history, send requests to the AI model, and process the responses, including handling any function calls (tool usage) requested by the model.
 
-Events:
+-   **`helper*.py`** (e.g., `helperfinhub.py`, `helperalphavantage.py`, `helperbqfunction.py`, `helpercode.py`, `helperstreamlit.py`): This collection of utility modules provides abstraction layers for various external services and internal functionalities:
+    -   `helperfinhub.py`: Interacts with the Finnhub API for financial data.
+    -   `helperalphavantage.py`: Interacts with the Alpha Vantage API for financial data.
+    -   `helperbqfunction.py`: Handles interactions with Google BigQuery.
+    -   `helpercode.py`: Contains common utility functions used across the application.
+    -   `helperstreamlit.py`: Provides helper functions specifically for Streamlit UI elements and interactions.
 
-Smaller industry conferences (FinTech, AI, Data Science): The demo is highly relevant to specialized audiences interested in financial technology, AI applications, or data science. It can be adapted to focus on specific aspects like Gemini's capabilities or data integration techniques.
-Google Cloud events (roadshows, workshops): The demo is a great showcase of Google Cloud products (Gemini, BigQuery, Cloud Functions, etc.) and can be incorporated into broader presentations about Google Cloud's AI/ML offerings. Hands-on workshops could be developed around the demo code.
-University recruiting events/hackathons: The project's clear structure and focus on cutting-edge technology make it attractive for student engagement. It can be used in hackathons or recruiting events to inspire and educate aspiring developers.
-Campaigns:
+-   **`gemini*function*.py`** (e.g., `geminifunctionfinhub.py`, `gemini20functiongeneral.py`): These files define the function declarations (tools) that are made available to the Gemini models. These declarations specify how the AI can request the application to perform actions, such as fetching data from Finnhub or looking up company information.
 
-Online marketing campaigns (blog posts, webinars, social media): The demo can be featured in content marketing efforts, such as blog posts, webinars, or social media posts, to demonstrate the practical applications of Gemini and Google Cloud in the financial industry. Code snippets and explanatory videos can be included to enhance engagement.
-Targeted email campaigns: The demo can be used in targeted email campaigns to specific customer segments (e.g., financial institutions, investment firms) to promote Google Cloud's AI/ML solutions.
-Sales Meetings:
+-   **`Dockerfile`**: Contains instructions to build a Docker image for the MarketMind application. This allows for packaging the application and its dependencies into a container for easy deployment and consistent execution across different environments.
 
-Proof-of-concept for potential clients: The demo can be adapted as a personalized proof-of-concept for potential clients in the financial sector, showcasing how Gemini can be tailored to address their specific data analysis needs. Live demonstrations can be highly effective in sales meetings.
-Technical deep dives: For clients interested in the technical details, the codebase can be used to illustrate the architecture and implementation of a Gemini-powered solution.
-Other Use Cases:
+-   **`.streamlit/config.toml`**: A configuration file for Streamlit. It can be used to customize the appearance (themes), set server options, and define other behaviors of the Streamlit application.
 
-Internal training: The demo project can be used to train Google Cloud sales teams and solutions architects on Gemini and related technologies.
-Open-source contribution: The project can be further developed and released as a more comprehensive open-source tool for financial analysis, fostering community engagement and attracting external contributions.
+-   **`requirements.txt`**: Lists all the Python packages and their versions that are required to run MarketMind. This file is used by `pip` to install the dependencies.
+
+-   **`images/`**: A directory used to store static image files, such as the project logo (`mmlogo1.png`), which are used within the application or documentation.
+
+### Running the Application
+
+1.  **Ensure Prerequisites and Configuration are Met:** Before running, make sure you have completed all steps in the "Getting Started" section, including installing dependencies and configuring API keys and environment variables.
+2.  **Navigate to the Project Directory:**
+    ```bash
+    cd marketmind
+    ```
+3.  **Run the Streamlit Application:**
+    ```bash
+    streamlit run main.py
+    ```
+    This will typically open the application in your default web browser.
+
+### Interacting with MarketMind
+
+Once the application is running, you'll see a chat interface powered by Streamlit.
+
+-   **Chat Interface:** Type your financial questions or commands directly into the input box. MarketMind will process your request and display the results.
+-   **Example Queries/Commands:**
+    Here are a few examples of what you can ask MarketMind (these are based on the capabilities demonstrated in the application's help information):
+    *   `Can you create an analyst report for the company ALPHABET INC-CL A that includes basic financials, company news for the year 2024 and company profile. Include the actual numbers as well. Include a summary of the analysis as well.`
+    *   `Can you create an analyst report for the company META`
+    *   `Can you compare the above analyst reports and give me a summary list pros and cons with a rating (Buy, Sell, Hold)`
+    *   To get current share price: `GOOGL for the last 6 months` (Note: The "last 6 months" part might be a placeholder for how you'd ask for price, the core is requesting a symbol like `GOOGL`)
+    *   Similarly for another company: `META for the last 6 months`
+
+### Selecting AI Models
+
+MarketMind allows you to choose from different Gemini AI models for analysis.
+
+-   You can typically find an option in the user interface (e.g., a dropdown or a dialog box triggered by a button like "Select Model") to switch between available models such as `gemini-1.5-pro-latest`, `gemini-1.5-flash-latest`, etc. The exact list of models may vary based on availability and configuration.
+
+### Authentication
+
+-   If user authentication is enabled (i.e., the `USEAUTH` environment variable is set to `True`), you will be prompted to log in with your Google account when you first access the application.
+-   If `USEAUTH` is `False`, the application will be accessible without a login.
+
+### Asynchronous Agent
+
+-   MarketMind includes an "Async Agent" feature, which can be useful for analyses that might take a longer time to complete.
+-   You may find a toggle or an option in the UI to enable or disable this feature for specific requests. When enabled, the application can handle these long-running tasks in the background without making you wait, potentially notifying you when complete (depending on the implementation).
+
+## Contributing
+
+Contributions are welcome! If you have suggestions for improvements or new features, please feel free to:
+1. Open an issue to discuss what you would like to change.
+2. Fork the repository and create a pull request with your contributions.
+
+## License
+
+This project is currently not licensed. All rights reserved.
